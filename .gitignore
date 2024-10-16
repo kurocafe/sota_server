@@ -9,3 +9,4 @@ tmp
 *.txt
 *nstaller*
 *gguf
+!assets/*.png
