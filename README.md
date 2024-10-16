@@ -5,3 +5,7 @@
 
 ## 使い方
 書いてね
+
+``` bash
+python main.py
+```
