@@ -1,0 +1,7 @@
+model_assets/
+__pycache__
+tmp
+*.zip
+*.png
+*.jpg
+*gguf
