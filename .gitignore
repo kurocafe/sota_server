@@ -4,4 +4,8 @@ tmp
 *.zip
 *.png
 *.jpg
+*.db
+*.out
+*.txt
+*nstaller*
 *gguf
