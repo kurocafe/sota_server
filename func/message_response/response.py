@@ -1,6 +1,7 @@
 import ollama
-
+import traceback
 from ctypes import *
+
 model_file='''
 FROM ./Llama-3-ELYZA-JP-8B-q4_k_m.gguf
 SYSTEM あなたは優しいおしとやかな女性です。描写はいらないです。セリフだけ送ってください。
@@ -21,8 +22,11 @@ PARAMETER stop "<|reserved_special_token"
 def load_model(model_file):
     print('OLLAMA')
     # createしたらどっかに保存されるので2回目以降は作らなくてもいい
-    ollama.create(model='llama3_soft', modelfile=model_file)
-
+    try: 
+        ollama.create(model='llama3_soft', modelfile=model_file)
+    except Exception as e:
+        print(f"エラーです。{str(e)}")
+        traceback.print_exc()
     
 def create_text(messages: list, text2) -> str:
     print(ollama.show(model="llama3_soft"))
@@ -41,5 +45,5 @@ def create_text(messages: list, text2) -> str:
     return text
 
 if __name__ == "__main__":
-    load_model(model_file=model_file)
-    print(create_text([], text2="ハローワーク行け"))
+    # load_model(model_file=model_file)
+    print(create_text([], text2="こんにちは！"))
