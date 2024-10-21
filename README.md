@@ -9,6 +9,7 @@
 - QRコードを読み取る
 
 ## クレジット
+- [Whisper](https://github.com/openai/whisper)
 - [Style-Bert-VITS2](https://github.com/litagin02/Style-Bert-VITS2)
 - [ollama](https://github.com/ollama/ollama)
 - [Llama-3-ELYZA-JP-8B](https://huggingface.co/elyza/Llama-3-ELYZA-JP-8B-GGUF)
