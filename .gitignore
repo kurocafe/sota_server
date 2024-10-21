@@ -1,6 +1,5 @@
 model_assets/
 __pycache__
-tmp
 *.zip
 *.png
 *.jpg
@@ -10,3 +9,4 @@ tmp
 *nstaller*
 *gguf
 !assets/*.png
+*.wav
