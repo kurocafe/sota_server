@@ -11,6 +11,7 @@ from func.message_response.response import load_model, create_text
 # from func.voice_vox.voice_vox import create_voice
 from func.sbt.sbt import sbt2_voice
 from func.qr.qr_read import decode_qr_code
+from func.qr.qr_gen import qr_generate
 
 import sqlite3 as sql
 
@@ -104,4 +105,7 @@ def qr_read(file: UploadFile = File(...)):
     data = decode_qr_code(file_path)
     
     return {"response": data}
-    
+
+@app.post("/qr_gen")
+def qr_gen():
+    qr_generate()
