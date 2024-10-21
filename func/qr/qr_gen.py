@@ -4,7 +4,7 @@ usr_id = 821611534961606706
 
 def qr_generate(usr_id: int):
     qr_str = usr_id
-    qr_path = "/mnt/data1/home/nakaura/VSCode/bot/SotaQR-Bot/assets/qr/qr.png"
+    qr_path = "./qr.png"
     
     # QRCodeオブジェクトを作成する
     qr = qrcode.QRCode(
