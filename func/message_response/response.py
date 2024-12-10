@@ -1,14 +1,15 @@
+import os
 import ollama
 import traceback
 from ctypes import *
 from langchain_community.embeddings import OllamaEmbeddings
 from llama_index.llms.ollama import Ollama
-from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
+from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, PropertyGraphIndex
 from llama_index.core.node_parser import SentenceSplitter
 import pymupdf4llm
 
 model_file='''
-FROM elyza:jp8b
+FROM /mnt/data1/home/nakaura/VSCode/llama/sota_server/Llama-3-ELYZA-JP-8B-q4_k_m.gguf
 SYSTEM あなたは大学の教授です。学生の研究のアドバイスをします
 TEMPLATE """{{ if .System }}<|start_header_id|>system<|end_header_id|>
 
@@ -20,11 +21,11 @@ TEMPLATE """{{ if .System }}<|start_header_id|>system<|end_header_id|>
 PARAMETER stop "<|start_header_id|>"
 PARAMETER stop "<|end_header_id|>"
 PARAMETER stop "<|eot_id|>"
-PARAMETER stop "<|reserved_special_token"
+PARAMETER stop "<|reserved_special_token|>"
 '''
 
 def test():
-    llm = Ollama(model='llama3_rag', request_timeout=30.0)
+    llm = Ollama(model='llama3-soft', request_timeout=30.0)
     embed_model = OllamaEmbeddings(model="mxbai-embed-large")
     llama_reader = pymupdf4llm.LlamaMarkdownReader()
     llama_docs = llama_reader.load_data("/mnt/data1/home/nakaura/VSCode/llama/sota_server/func/message_response/pdf/MuSE.pdf")
@@ -33,9 +34,50 @@ def test():
     # reader = SimpleDirectoryReader(input_files=["/mnt/data1/home/nakaura/VSCode/llama/sota_server/func/message_response/pdf/MuSE.pdf"])
     # data = reader.load_data()
     index = VectorStoreIndex.from_documents(llama_docs, embed_model=embed_model, transformations=[SentenceSplitter(chunk_size=256)])
+    # index = PropertyGraphIndex.from_documents(llama_docs, embed_model=embed_model, transformations=[SentenceSplitter(chunk_size=256)])
     # index = VectorStoreIndex.from_documents(llama_docs, embed_model=embed_model)
-    query_engine = index.as_query_engine(llm=llm, streaming=False, similarity_top_k=5)
-    response = query_engine.query("私は感情分析の研究をしたいと考えています。使用すべきデータセットを教えてください。")
+    query_engine = index.as_query_engine(llm=llm, streaming=False, similarity_top_k=5, score_threshold=0.75)
+    response = query_engine.query("この論文を書いている大学はどこですか？")
+    print(response)
+    
+def talk():
+    llm = Ollama(model='elyza:8b-instruct', request_timeout=30.0)
+    embed_model = OllamaEmbeddings(model="mxbai-embed-large")
+    llama_reader = pymupdf4llm.LlamaMarkdownReader()
+    llama_docs = llama_reader.load_data("/mnt/data1/home/nakaura/VSCode/llama/sota_server/func/message_response/pdf/MuSE.pdf")
+    index = VectorStoreIndex.from_documents(llama_docs, embed_model=embed_model, transformations=[SentenceSplitter(chunk_size=256)])
+    query_engine = index.as_query_engine(llm=llm, streaming=False, similarity_top_k=5, verbose=False)
+
+    print("質問を入力してください。終了するには 'quit' と入力してください。")
+    while True:
+        user_input = input("質問: ")
+        if user_input.lower() == 'quit':
+            break
+        response = query_engine.query(user_input)
+        
+        # responseオブジェクトから実際の回答テキストを抽出
+        if hasattr(response, 'response'):
+            print(response.response)
+        elif isinstance(response, str):
+            print(response)
+        else:
+            print("回答を取得できませんでした。")
+    
+def test2():
+    # ドキュメントの読み込み
+    documents = SimpleDirectoryReader("/mnt/data1/home/nakaura/VSCode/llama/sota_server/func/message_response/pdf").load_data()
+
+    # Ollamaを使用してLlamaモデルを初期化
+    llm = Ollama(model="llama3_rag")
+
+    # PropertyGraphIndexの作成
+    index = PropertyGraphIndex.from_documents(documents)
+
+    # クエリエンジンの作成
+    query_engine = index.as_query_engine(llm=llm)
+
+    # クエリの実行
+    response = query_engine.query("あなたの質問をここに入力")
     print(response)
     
     
@@ -52,10 +94,16 @@ def join():
 
 
 def load_model(model_file):
-    print('OLLAMA')
+    print(model_file)
+    # モデルファイルの存在確認
+    if not os.path.isfile(model_file):
+        print("ファイルがないよ！")
+        return
+    
     # createしたらどっかに保存されるので2回目以降は作らなくてもいい
     try: 
         ollama.create(model='llama3_rag', modelfile=model_file)
+        print("モデルが正常にロードされました")
     except Exception as e:
         print(f"エラーです。{str(e)}")
         traceback.print_exc()
@@ -77,7 +125,8 @@ def create_text(messages: list, text2) -> str:
     return text
 
 if __name__ == "__main__":
-    # load_model(model_file=model_file)
+    # load_model(model_file)
     # print(create_text([], text2="こんにちは！")
     # join()
-    test()
+    # test()
+    talk()
