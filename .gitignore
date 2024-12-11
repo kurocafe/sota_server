@@ -11,3 +11,4 @@ __pycache__
 !assets/*.png
 *.wav
 *.pdf
+.env
