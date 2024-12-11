@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from fastapi.responses import FileResponse
 
 from pydantic import BaseModel
@@ -107,8 +107,9 @@ def qr_read(file: UploadFile = File(...)):
     return {"response": data}
 
 @app.post("/qr_gen/{user_id}")
-def qr_gen(user_id: int):
+def qr_gen(user_id: int, name: str = Query(..., description="User's name")):
     qr_generate(user_id)
+    print(name)
     qr_path = "./qr.png"
     if os.path.exists(qr_path):
         return FileResponse(qr_path, media_type="image/png", filename="qr_code.png")
