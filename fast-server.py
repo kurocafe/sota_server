@@ -114,3 +114,8 @@ def qr_gen(user_id: int):
         return FileResponse(qr_path, media_type="image/png", filename="qr_code.png")
     else:
         raise HTTPException(status_code=500, detail="QR code generation failed")
+    
+if __name__ == "__main__":
+    import uvicorn
+    
+    uvicorn.run(app,host="150.59.20.116", port=8000)
