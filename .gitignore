@@ -12,6 +12,7 @@ __pycache__
 *.wav
 *.pdf
 .env
-Modelfile
+Modelfile*
 =2.0.0
 help_me.py
+*.json
