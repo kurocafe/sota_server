@@ -108,7 +108,7 @@ def qr_read(file: UploadFile = File(...)):
 
 @app.post("/qr_gen/{user_id}")
 def qr_gen(user_id: int, name: str = Query(..., description="User's name")):
-    qr_generate(user_id)
+    qr_generate(user_id, name)
     print(name)
     qr_path = "./qr.png"
     if os.path.exists(qr_path):
