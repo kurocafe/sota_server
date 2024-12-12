@@ -8,7 +8,7 @@ import soundfile as sf
 from os import getenv
 from dotenv import load_dotenv
 load_dotenv()
-PATH = getenv("PATH")
+PATH = getenv("MODEL_ROOT")
 
 FILE_PATH = f"{PATH}/tmp/output.wav"
 
