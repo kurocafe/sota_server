@@ -1,6 +1,6 @@
 import sqlite3 as sql
 import json
-from func.db.create_db import create_db
+from ..db.create_db import create_db
 
 def add_user(user_id, user_name):
     dbname = 'Memory.db'
@@ -37,18 +37,25 @@ def add_msg(user_id, message):
     if cur.fetchone() is None:
         return None
     
+    # messageをdbに追加
     try :
         cur.execute(f'INSERT INTO messages(usr_id, message) values(?, ?)',
                     (user_id, json.dumps(message, ensure_ascii=False)))
         conn.commit()
     except Exception as e:
-        return e
+        print(e)
     
+
+    
+def pull_msg(user_id):
+    dbname = 'Memory.db'
+    conn = sql.connect(dbname)
+    cur = conn.cursor()
     message_str = cur.execute(f'SELECT message FROM messages WHERE usr_id={user_id}').fetchall()
     
     try:
         message_json = [json.loads(s[0]) for s in message_str]
-        return message_json
+        return message_json[-30:]
     except Exception as e:
-        return e
+        print(e)
         
