@@ -1,41 +1,41 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from fastapi.responses import FileResponse
-
 from pydantic import BaseModel
-
 import shutil
 import os
-
 from func.speech_recog.speech_recog import speech_recog
 from func.message_response.response import load_model, create_text
 # from func.voice_vox.voice_vox import create_voice
 from func.sbt.sbt import sbt2_voice
 from func.qr.qr_read import decode_qr_code
 from func.qr.qr_gen import qr_generate
-
 import sqlite3 as sql
-
+from dotenv import load_dotenv
+load_dotenv()
+API_HOME = os.getenv("")
 messages = [
     {'role': 'assistant', 'content': "何でも話してね"}
 ]
 
+UserID = None
+
 app = FastAPI()
 
-dbname = 'memory.db'
-conn = sql.connect(dbname)
+# dbname = 'memory.db'
+# conn = sql.connect(dbname)
 
-cur = conn.cursor()
-table1 = cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="persons"').fetchone()
-if table1 is None :        
-    cur.execute(
-        'CREATE TABLE persons(id INTEGER PRIMARY KEY, name STRING)'
-    )
+# cur = conn.cursor()
+# table1 = cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="persons"').fetchone()
+# if table1 is None :        
+#     cur.execute(
+#         'CREATE TABLE persons(id INTEGER PRIMARY KEY, name STRING)'
+#     )
     
-table2 = cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="messages"').fetchone()
-if table2 is None:
-    cur.execute(
-        'CREATE TABLE messages(id INTEGER PRIMARY KEY AUTOINCREMENT, usr_id INTEGER, message STRING)'
-    )
+# table2 = cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="messages"').fetchone()
+# if table2 is None:
+#     cur.execute(
+#         'CREATE TABLE messages(id INTEGER PRIMARY KEY AUTOINCREMENT, usr_id INTEGER, message STRING)'
+#     )
 
 class Item(BaseModel):
     message: str
@@ -101,9 +101,8 @@ def qr_read(file: UploadFile = File(...)):
     os.makedirs("./tmp", exist_ok=True)
     with open(file_path,"wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-        
     data = decode_qr_code(file_path)
-    
+    UserID = data
     return {"response": data}
 
 @app.post("/qr_gen/{user_id}")
@@ -119,4 +118,4 @@ def qr_gen(user_id: int, name: str = Query(..., description="User's name")):
 if __name__ == "__main__":
     import uvicorn
     
-    uvicorn.run(app,host="150.59.20.116", port=8000)
+    uvicorn.run(app,host=API_HOME, port=8000)
