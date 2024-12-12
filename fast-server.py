@@ -12,12 +12,12 @@ from func.qr.qr_gen import qr_generate
 import sqlite3 as sql
 from dotenv import load_dotenv
 load_dotenv()
-API_HOME = os.getenv("")
+API_HOME = os.getenv("API_HOME")
 messages = [
     {'role': 'assistant', 'content': "何でも話してね"}
 ]
 
-UserID = None
+UserID = 821611534961606706
 
 app = FastAPI()
 
@@ -78,7 +78,7 @@ def speech_rec(file: UploadFile = File(...)):
 
 @app.post("/generate")
 def generate(item: GenerateBody):
-    response = create_text(messages, item.user_message)
+    response = create_text(messages, item.user_message, UserID)
     print(response)
     return {"response": response}
 
