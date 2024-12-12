@@ -12,3 +12,5 @@ __pycache__
 *.wav
 *.pdf
 .env
+Modelfile
+=2.0.0

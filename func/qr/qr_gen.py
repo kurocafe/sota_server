@@ -1,10 +1,12 @@
 import qrcode
-usr_id = 821611534961606706
+from ..db.add_db import add_user
 
-
-def qr_generate(usr_id: int):
+def qr_generate(usr_id: int, name: str):
     qr_str = usr_id
     qr_path = "./qr.png"
+    
+    # ユーザーをデータベースに登録する
+    add_user(usr_id, name)
     
     # QRCodeオブジェクトを作成する
     qr = qrcode.QRCode(

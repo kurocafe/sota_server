@@ -33,7 +33,7 @@ def test():
     # print(f"最初のドキュメントの内容: {llama_docs[0].text[:500]}")
     # reader = SimpleDirectoryReader(input_files=["/mnt/data1/home/nakaura/VSCode/llama/sota_server/func/message_response/pdf/MuSE.pdf"])
     # data = reader.load_data()
-    index = VectorStoreIndex.from_documents(llama_docs, embed_model=embed_model, transformations=[SentenceSplitter(chunk_size=256)])
+    index = VectorStoreIndex.from_documents(llama_docs, embed_model=embed_model, transformations=[SentenceSplitter(chunk_size=1024)])
     # index = PropertyGraphIndex.from_documents(llama_docs, embed_model=embed_model, transformations=[SentenceSplitter(chunk_size=256)])
     # index = VectorStoreIndex.from_documents(llama_docs, embed_model=embed_model)
     query_engine = index.as_query_engine(llm=llm, streaming=False, similarity_top_k=5, score_threshold=0.75)
