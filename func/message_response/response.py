@@ -7,6 +7,7 @@ from llama_index.llms.ollama import Ollama
 from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, PropertyGraphIndex
 from llama_index.core.node_parser import SentenceSplitter
 import pymupdf4llm
+from func.db.add_db import add_msg, pull_msg
 
 model_file='''
 FROM /mnt/data1/home/nakaura/VSCode/llama/sota_server/Llama-3-ELYZA-JP-8B-q4_k_m.gguf
@@ -108,19 +109,23 @@ def load_model(model_file):
         print(f"エラーです。{str(e)}")
         traceback.print_exc()
     
-def create_text(messages: list, text2) -> str:
-    print(ollama.show(model="llama3_soft"))
+def create_text(messages: list, text2, user_id) -> str:
+    # print(ollama.show(model="llama3_soft"))
     usr_message = {'role': 'user', 'content': text2}
-    messages.append(usr_message)
-    if 40 < len(messages):
-        messages.pop(1)
-    print(messages)
-    response = ollama.chat(model='llama3_soft', messages=messages)
+    
+    add_msg(user_id, usr_message)
+    # messages.append(usr_message)
+    # if 40 < len(messages):
+    #     messages.pop(1)
+    # print(messages)
+    response = ollama.chat(model='llama3_soft', messages=pull_msg(user_id))
     text = response['message']['content']
     new_message = {'role': 'assistant', 'content': text}
-    if 10 < len(messages):
-        messages.pop(1)
-    messages.append(new_message)
+    
+    add_msg(user_id, new_message)
+    # if 10 < len(messages):
+    #     messages.pop(1)
+    # messages.append(new_message)
     
     return text
 
