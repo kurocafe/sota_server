@@ -29,7 +29,7 @@ def test():
     llm = Ollama(model='llama3-soft', request_timeout=30.0)
     embed_model = OllamaEmbeddings(model="mxbai-embed-large")
     llama_reader = pymupdf4llm.LlamaMarkdownReader()
-    llama_docs = llama_reader.load_data("/mnt/data1/home/nakaura/VSCode/llama/sota_server/func/message_response/pdf/MuSE.pdf")
+    llama_docs = llama_reader.load_data("/mnt/data1/home/nakaura/VSCode/llama/sota_server/func/message_response/pdf/takanabe.pdf")
     # print(f"LlamaIndexドキュメントの数: {len(llama_docs)}")
     # print(f"最初のドキュメントの内容: {llama_docs[0].text[:500]}")
     # reader = SimpleDirectoryReader(input_files=["/mnt/data1/home/nakaura/VSCode/llama/sota_server/func/message_response/pdf/MuSE.pdf"])
@@ -45,9 +45,9 @@ def talk():
     llm = Ollama(model='elyza:8b-instruct', request_timeout=30.0)
     embed_model = OllamaEmbeddings(model="mxbai-embed-large")
     llama_reader = pymupdf4llm.LlamaMarkdownReader()
-    llama_docs = llama_reader.load_data("/mnt/data1/home/nakaura/VSCode/llama/sota_server/func/message_response/pdf/MuSE.pdf")
+    llama_docs = llama_reader.load_data("/mnt/data1/home/nakaura/VSCode/llama/sota_server/func/message_response/pdf/PACLIC_1216.pdf")
     index = VectorStoreIndex.from_documents(llama_docs, embed_model=embed_model, transformations=[SentenceSplitter(chunk_size=256)])
-    query_engine = index.as_query_engine(llm=llm, streaming=False, similarity_top_k=5, verbose=False)
+    query_engine = index.as_query_engine(llm=llm, streaming=False, similarity_top_k=5, verbose=False, score_threshold=0.80)
 
     print("質問を入力してください。終了するには 'quit' と入力してください。")
     while True:
