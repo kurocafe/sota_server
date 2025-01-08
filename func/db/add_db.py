@@ -43,8 +43,9 @@ def add_msg(user_id, message):
                     (user_id, json.dumps(message, ensure_ascii=False)))
         conn.commit()
     except Exception as e:
-        print(e)
-    
+        print(f"An error occurred: {e}")
+    finally:
+        conn.close()
 
     
 def pull_msg(user_id):
@@ -57,5 +58,21 @@ def pull_msg(user_id):
         message_json = [json.loads(s[0]) for s in message_str]
         return message_json[-30:]
     except Exception as e:
-        print(e)
+        print(f"An error occurred: {e}")
+    finally:
+        conn.close()
         
+def pull_user(user_id):
+    dbname = 'Memory.db'
+    conn = sql.connect(dbname)
+    cur = conn.cursor()
+    try:
+        user_name = cur.execute('SELECT name FROM persons WHERE id = ?', (user_id,)).fetchone()
+        if user_name:
+            return user_name[0]  # 名前を返す
+        else:
+            return None  # ユーザーが見つからなかった場合
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        conn.close()

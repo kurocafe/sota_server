@@ -45,6 +45,8 @@ class GenerateBody(BaseModel):
     user_message: str
     
 
+    
+
 @app.get("/")
 def read_root():
     return {"message": "Hello World"}
@@ -83,10 +85,14 @@ def generate(item: GenerateBody):
     return {"response": response}
 
 @app.get("/tts", response_class=FileResponse)
-def tts(text: str, chara_id :int = 0):
-    print(text)
-    path = sbt2_voice(text=text, chara_id=chara_id)
-    return path
+def tts(text: str, chara_id: int = 0):
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Text parameter cannot be empty.")
+    try:
+        path = sbt2_voice(text=text, chara_id=chara_id)
+        return path
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=f"Error during TTS processing: {str(e)}")
 
 # @app.get("/tts", response_class=FileResponse)
 # def tts(text: str, speaker_id: int):
@@ -102,7 +108,8 @@ def qr_read(file: UploadFile = File(...)):
     with open(file_path,"wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     data = decode_qr_code(file_path)
-    UserID = data
+    UserName = data
+    print(f"UserName: {UserName}")
     return {"response": data}
 
 @app.post("/qr_gen/{user_id}")
@@ -117,5 +124,6 @@ def qr_gen(user_id: int, name: str = Query(..., description="User's name")):
     
 if __name__ == "__main__":
     import uvicorn
-    
+    from func.sbt.sbt import load_models
+    load_models()
     uvicorn.run(app,host=API_HOME, port=8000)
