@@ -1,6 +1,6 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import shutil
 import os
 from func.speech_recog.speech_recog import speech_recog
@@ -9,6 +9,7 @@ from func.message_response.response import load_model, create_text
 from func.sbt.sbt import sbt2_voice
 from func.qr.qr_read import decode_qr_code
 from func.qr.qr_gen import qr_generate
+from func.db.add_db import pull_user
 import sqlite3 as sql
 from dotenv import load_dotenv
 load_dotenv()
@@ -17,7 +18,6 @@ messages = [
     {'role': 'assistant', 'content': "何でも話してね"}
 ]
 
-UserID = 821611534961606706
 
 app = FastAPI()
 
@@ -43,7 +43,7 @@ class Item(BaseModel):
 
 class GenerateBody(BaseModel):
     user_message: str
-    
+    user_id: int
 
     
 
@@ -80,9 +80,16 @@ def speech_rec(file: UploadFile = File(...)):
 
 @app.post("/generate")
 def generate(item: GenerateBody):
-    response = create_text(messages, item.user_message, UserID)
-    print(response)
-    return {"response": response}
+    print(f"user_message: {item.user_message}, user_id: {item.user_id}")
+    try:
+        user_id = int(item.user_id)
+        response = create_text(messages, item.user_message, user_id)
+        print(response)
+        return {"response": response}
+    except ValueError:
+        raise HTTPException(status_code=422, detail="Invalid user_id format")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 @app.get("/tts", response_class=FileResponse)
 def tts(text: str, chara_id: int = 0):
@@ -108,9 +115,10 @@ def qr_read(file: UploadFile = File(...)):
     with open(file_path,"wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     data = decode_qr_code(file_path)
-    UserName = data
+    UserID = data
+    UserName = pull_user(UserID)
     print(f"UserName: {UserName}")
-    return {"response": data}
+    return {"response": UserName, "user_id": UserID}
 
 @app.post("/qr_gen/{user_id}")
 def qr_gen(user_id: int, name: str = Query(..., description="User's name")):

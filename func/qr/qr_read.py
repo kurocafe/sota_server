@@ -60,9 +60,10 @@ def decode_qr_code(image_path) -> str:
         if decoded_objects:
             for obj in decoded_objects:
                 print(f"QRコードの内容: {obj.data.decode('utf-8')}")
-                pull_user(obj.data.decode('utf-8'))
+                user_id = obj.data.decode('utf-8')
+                # pull_user(user_id)
                 # return obj.data.decode('utf-8')
-                return pull_user(obj.data.decode('utf-8'))
+                return user_id 
         else:
             print("QRコードが検出されませんでした。")
             return None
