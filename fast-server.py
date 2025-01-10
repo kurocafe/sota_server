@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 import shutil
 import os
 from func.speech_recog.speech_recog import speech_recog
-from func.message_response.response import load_model, create_text
+from func.message_response.response import load_model, create_text, init_chat
 # from func.voice_vox.voice_vox import create_voice
 from func.sbt.sbt import sbt2_voice
 from func.qr.qr_read import decode_qr_code
@@ -115,10 +115,14 @@ def qr_read(file: UploadFile = File(...)):
     with open(file_path,"wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     data = decode_qr_code(file_path)
-    UserID = data
-    UserName = pull_user(UserID)
-    print(f"UserName: {UserName}")
-    return {"response": UserName, "user_id": UserID}
+    if data is None:    
+        return {"response": None, "user_id": None, "init_message": None}
+    else :
+        UserID = data
+        UserName = pull_user(UserID)
+        print(f"UserName: {UserName}")
+        init_message = init_chat(UserID)
+        return {"response": UserName, "user_id": UserID, "init_message": init_message}
 
 @app.post("/qr_gen/{user_id}")
 def qr_gen(user_id: int, name: str = Query(..., description="User's name")):

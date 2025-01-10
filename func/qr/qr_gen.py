@@ -32,7 +32,7 @@ def qr_generate(usr_id: int, name: str):
 if __name__ == '__main__':
     # qr_str = "https://www.google.co.jp/"
     # サーバーからOKもらうまで送り続ける
-    qr_str = usr_id
+    # qr_str = usr_id
     qr_file_name = "qr_test.png"
     
     # QRCodeオブジェクトを作成する
