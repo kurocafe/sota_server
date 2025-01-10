@@ -4,6 +4,7 @@ import traceback
 import os
 import cv2
 import numpy as np
+from func.db.add_db import pull_user
 
 
 # def decode_qr_code(image_path) -> str:
@@ -59,7 +60,10 @@ def decode_qr_code(image_path) -> str:
         if decoded_objects:
             for obj in decoded_objects:
                 print(f"QRコードの内容: {obj.data.decode('utf-8')}")
-                return obj.data.decode('utf-8')
+                user_id = obj.data.decode('utf-8')
+                # pull_user(user_id)
+                # return obj.data.decode('utf-8')
+                return user_id 
         else:
             print("QRコードが検出されませんでした。")
             return None

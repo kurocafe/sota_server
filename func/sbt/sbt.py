@@ -26,7 +26,8 @@ model_dict = {
 def load_models()-> None: 
     bert_models.load_model(Languages.JP, "ku-nlp/deberta-v2-large-japanese-char-wwm")
     bert_models.load_tokenizer(Languages.JP, "ku-nlp/deberta-v2-large-japanese-char-wwm")
-
+    print("Model and tokenizers loaded successfully!")
+    
 # model_file = "jvnv-F1-jp/jvnv-F1-jp_e160_s14000.safetensors"
 # config_file = "jvnv-F1-jp/config.json"
 # style_file = "jvnv-F1-jp/style_vectors.npy"
@@ -35,7 +36,7 @@ def load_models()-> None:
 #     print(file)
 #     hf_hub_download("litagin/style_bert_vits2_jvnv", file, local_dir="model_assets")
 def sbt2_voice(text :str, chara_id :int = 0)-> str:
-    load_models()
+    # load_models()
     
     if chara_id not in model_dict:        
         chara = chara_dict[chara_id]
@@ -56,11 +57,16 @@ def sbt2_voice(text :str, chara_id :int = 0)-> str:
     
     model = model_dict[chara_id]
 
-    sr, audio = model.infer(text=text)
-    sf.write(FILE_PATH, audio, sr)
-    # display(Audio(PATH))
+    try:
+        sr, audio = model.infer(text=text)
+        sf.write(FILE_PATH, audio, sr)
+        # display(Audio(PATH))
+        return FILE_PATH
+    except Exception as e:
+        raise RuntimeError(f"Error during inference: {e}")
     
-    return FILE_PATH
 
 if __name__ == '__main__':
     sbt2_voice("録音テストを始めるよ")
+    
+    
