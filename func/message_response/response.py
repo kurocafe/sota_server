@@ -33,6 +33,8 @@ PARAMETER stop "<|eot_id|>"
 PARAMETER stop "<|reserved_special_token|>"
 '''
 
+model = "llama3-test"
+
 def test():
     llm = Ollama(model='llama3-soft', request_timeout=30.0)
     embed_model = OllamaEmbeddings(model="mxbai-embed-large")
@@ -167,7 +169,7 @@ def create_text(messages: list, text2, user_id) -> str:
     usr_message = {'role': 'user', 'content': text2}
     
     add_msg(user_id, usr_message)
-    response = ollama.chat(model='llama3_soft', messages=pull_msg(user_id))
+    response = ollama.chat(model=model, messages=pull_msg(user_id))
     text = response['message']['content']
     new_message = {'role': 'assistant', 'content': text}
     
@@ -178,7 +180,7 @@ def init_chat(user_id)-> str:
     init_text = "会話を始めます。ユーザーにどんな研究や分野に興味があるか質問してください。"
     sys_message = {'role': 'system', 'content': init_text}
     add_msg(user_id, sys_message)
-    response = ollama.chat(model='llama3_soft', messages=pull_msg(user_id))
+    response = ollama.chat(model=model, messages=pull_msg(user_id))
     text = response['message']['content']
     llm_message = {'role': 'assistant', 'content': text}
     add_msg(user_id, llm_message)
