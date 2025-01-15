@@ -177,7 +177,7 @@ def create_text(messages: list, text2, user_id) -> str:
     return text
 
 def init_chat(user_id)-> str:
-    init_text = "会話を始めます。ユーザーにどんな研究や分野に興味があるか質問してください。"
+    init_text = "SNS、情報検索、マルチモーダル、ロボット、テキストチャットから、ユーザーの興味のある分野を質問してください。"
     sys_message = {'role': 'system', 'content': init_text}
     add_msg(user_id, sys_message)
     response = ollama.chat(model=model, messages=pull_msg(user_id))
@@ -187,10 +187,26 @@ def init_chat(user_id)-> str:
     
     return text
 
+def gen_keyword(user_id) -> str:
+    try:
+        sys_text = "ユーザーの発言から、論文検索に使うキーワードを一つ決めてください。「」などは必要ないです。"
+        sys_message = {'role': 'system', 'content': sys_text}
+        add_msg(user_id, sys_message)
+        response = ollama.chat(model=model, messages=pull_msg(user_id, 10))
+        text = response['message']['content']
+        llm_message = {'role': 'assistant', 'content': text}
+        add_msg(user_id, llm_message)
+        
+        return text
+    except Exception as e:
+        print(f"gen_keyword ERROR: {e}")
+        raise
+
 if __name__ == "__main__":
     # load_model(model_file)
     # print(create_text([], text2="こんにちは！")
     # join()
     # test()
     # talk()
-    ask_directly_with_llm()
+    # ask_directly_with_llm()
+    print(f"keyword: {gen_keyword(821611534961606706)}")

@@ -48,7 +48,7 @@ def add_msg(user_id, message):
         conn.close()
 
     
-def pull_msg(user_id):
+def pull_msg(user_id, num = 10):
     dbname = 'Memory.db'
     conn = sql.connect(dbname)
     cur = conn.cursor()
@@ -56,7 +56,7 @@ def pull_msg(user_id):
     
     try:
         message_json = [json.loads(s[0]) for s in message_str]
-        return message_json[-30:]
+        return message_json[-num:]
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
