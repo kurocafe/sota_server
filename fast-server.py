@@ -3,8 +3,10 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 import shutil
 import os
+import traceback
 from func.speech_recog.speech_recog import speech_recog
-from func.message_response.response import load_model, create_text, init_chat
+from func.message_response.response import load_model, create_text, init_chat, gen_keyword
+from func.thesis_func.search2bot import search_from_db
 # from func.voice_vox.voice_vox import create_voice
 from func.sbt.sbt import sbt2_voice
 from func.qr.qr_read import decode_qr_code
@@ -43,6 +45,9 @@ class Item(BaseModel):
 
 class GenerateBody(BaseModel):
     user_message: str
+    user_id: int
+    
+class UserId(BaseModel):
     user_id: int
 
     
@@ -90,6 +95,22 @@ def generate(item: GenerateBody):
         raise HTTPException(status_code=422, detail="Invalid user_id format")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+    
+@app.post("/search")
+def search(item: UserId):
+    print(f"user_id: {item.user_id}")
+    try:
+        user_id = int(item.user_id)
+        keyword = gen_keyword(user_id)
+        print(f"keyword: {keyword}")
+        search_from_db(keyword, user_id)
+        
+        return {"response": keyword}
+    except ValueError:
+        raise HTTPException(status_code=422, detail="Invalid user_id format")
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 @app.get("/tts", response_class=FileResponse)
 def tts(text: str, chara_id: int = 0):
@@ -115,6 +136,7 @@ def qr_read(file: UploadFile = File(...)):
     with open(file_path,"wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     data = decode_qr_code(file_path)
+    data = '821611534961606706'
     if data is None:    
         return {"response": None, "user_id": None, "init_message": None}
     else :
@@ -138,4 +160,4 @@ if __name__ == "__main__":
     import uvicorn
     from func.sbt.sbt import load_models
     load_models()
-    uvicorn.run(app,host=API_HOME, port=8000)
+    uvicorn.run(app,host=API_HOME, port=8000, log_level="debug")
