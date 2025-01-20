@@ -16,6 +16,7 @@ import sqlite3 as sql
 from dotenv import load_dotenv
 load_dotenv()
 API_HOME = os.getenv("API_HOME")
+DEVELOPER_ID = int(os.getenv("DEVELOPER_ID"))
 messages = [
     {'role': 'assistant', 'content': "何でも話してね"}
 ]
@@ -136,7 +137,7 @@ def qr_read(file: UploadFile = File(...)):
     with open(file_path,"wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     data = decode_qr_code(file_path)
-    data = '821611534961606706'
+    data = DEVELOPER_ID
     if data is None:    
         return {"response": None, "user_id": None, "init_message": None}
     else :

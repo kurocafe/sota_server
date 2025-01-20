@@ -177,7 +177,7 @@ def create_text(messages: list, text2, user_id) -> str:
     return text
 
 def init_chat(user_id)-> str:
-    init_text = "'SNS'、'情報検索'、'マルチモーダル'、'ロボット'、'テキストチャット'から、ユーザがどんなことに興味のあるかを聞いてください。"
+    init_text = "ここから雑談を始めます．'SNS'、'情報検索'、'マルチモーダル'、'ロボット'、'テキストチャット'から、ユーザにどんな研究分野に興味のあるかを日本語で聞いてください．また，ユーザの発言を聞いたら，それに対して適切に返答してください．"
     sys_message = {'role': 'system', 'content': init_text}
     add_msg(user_id, sys_message)
     response = ollama.chat(model=model, messages=pull_msg(user_id), options={"num_ctx": 128})
