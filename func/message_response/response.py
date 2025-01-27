@@ -177,10 +177,10 @@ def create_text(messages: list, text2, user_id) -> str:
     return text
 
 def init_chat(user_id)-> str:
-    init_text = "SNS、情報検索、マルチモーダル、ロボット、テキストチャットから、ユーザーの興味のある分野を質問してください。"
+    init_text = "'SNS'、'情報検索'、'マルチモーダル'、'ロボット'、'テキストチャット'から、ユーザがどんなことに興味のあるかを聞いてください。"
     sys_message = {'role': 'system', 'content': init_text}
     add_msg(user_id, sys_message)
-    response = ollama.chat(model=model, messages=pull_msg(user_id))
+    response = ollama.chat(model=model, messages=pull_msg(user_id), options={"num_ctx": 128})
     text = response['message']['content']
     llm_message = {'role': 'assistant', 'content': text}
     add_msg(user_id, llm_message)
@@ -192,7 +192,7 @@ def gen_keyword(user_id) -> str:
         sys_text = "ユーザーの発言から、論文検索に使うキーワードを一つ決めてください。「」などは必要ないです。"
         sys_message = {'role': 'system', 'content': sys_text}
         add_msg(user_id, sys_message)
-        response = ollama.chat(model=model, messages=pull_msg(user_id, 10))
+        response = ollama.chat(model=model, messages=pull_msg(user_id, 8))
         text = response['message']['content']
         llm_message = {'role': 'assistant', 'content': text}
         add_msg(user_id, llm_message)
