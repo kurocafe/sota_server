@@ -139,10 +139,53 @@ def process_file(file_path):
 # メイン処理
 
 # メイン処理の最初にデータベースを初期化
-initialize_database()
+# initialize_database()
 
-base_dir = "thesisDB/"
-files = list_files(base_dir)
+# base_dir = "thesisDB/"
+# files = list_files(base_dir)
 
-with ThreadPoolExecutor(max_workers=4) as executor:
-    executor.map(process_file, files)
+# with ThreadPoolExecutor(max_workers=4) as executor:
+#     executor.map(process_file, files)
+
+
+def calculate_average_compression_rate():
+    connection = sqlite3.connect('thesis_database.db')
+    cursor = connection.cursor()
+    
+    cursor.execute("SELECT file_path FROM theses")
+    files = cursor.fetchall()
+    
+    total_compression_rate = 0
+    count = 0
+
+    for (file_path,) in files:
+        original_text = extract_text_from_pdf(file_path)
+        if not original_text:
+            continue
+        
+        cursor.execute("SELECT purpose, method, results, conclusion FROM theses WHERE file_path = ?", (file_path,))
+        summary_parts = cursor.fetchone()
+        if not summary_parts:
+            continue
+        
+        summary_text = " ".join(filter(None, summary_parts))  # Noneを除外して結合
+        original_length = len(original_text)
+        summary_length = len(summary_text)
+
+        if original_length > 0:
+            compression_rate = (summary_length / original_length) * 100
+            total_compression_rate += compression_rate
+            count += 1
+
+    connection.close()
+    
+    return total_compression_rate / count if count > 0 else 0
+
+# 平均圧縮率を計算
+# average_compression_rate = calculate_average_compression_rate()
+# print(f"平均圧縮率: {average_compression_rate:.2f}%")
+
+if __name__ == "__main__":
+    # 平均圧縮率を計算
+    average_compression_rate = calculate_average_compression_rate()
+    print(f"平均圧縮率: {average_compression_rate:.2f}%")
